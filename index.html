@@ -1,94 +1,127 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Personal vocabulary</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
-    <h1>Hello, new word!</h1>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="pouchdb-3.2.0.min"></script>
-<script>
-var db = new PouchDB('http://localhost:5984/vocabulary');
-showWords();
+    <head>
+        <title>Personal vocabulary</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    </head>
+    <body>
+        <h1>Hello, new word!</h1>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="pouchdb-3.2.0.min"></script>
+        <script>
+            var db = new PouchDB('http://localhost:5984/vocabulary');
+            showWords();
 
-function redrawTodosUI(todos) {
-    //var ul = document.getElementById('word-list');
-    //ul.innerHTML = '';
-$("#table_div").empty();
-    todos.forEach(function(todo) {
-	$("#table_div").append("<tr><td>" + todo.doc.fieldA + "</td><td>" + todo.doc.fieldB + "</td></tr>");
-      //ul.appendChild(createTodoListItem(todo.doc));
-    });
-  }
+            function redrawTodosUI(todos) {
+                //var ul = document.getElementById('word-list');
+                //ul.innerHTML = '';
+                $("#table_div").empty();
+                todos.forEach(function(todo) {
+                    $("#table_div").append("<tr><td>" + todo.doc.fieldA + "</td><td>" + todo.doc.fieldB + "</td></tr>");
+                    //ul.appendChild(createTodoListItem(todo.doc));
+                });
+            }
 
-function reloadWords() {
-	showWords();
-}
+            function showWords() {
+                //Load all docs
+                db.allDocs({include_docs: true, descending: true}, function(err, doc) {
+                    console.log("Retrieved all document objects:\n");
+                    console.log(doc);
+                    console.log("Error while retrieving all docs:\n");
+                    console.log(err);
+                    redrawTodosUI(doc.rows);
+                });
+            }
 
-function showWords() {
-//Load all docs
-  db.allDocs({include_docs: true, descending: true}, function(err, doc) {
-    console.log("Retrieved all document objects:\n");
-    console.log(doc);
-    console.log("Error while retrieving all docs:\n");
-    console.log(err);
-    redrawTodosUI(doc.rows);
-  });
-}
+            function saveWord() {
+                db.post({
+                    fieldA: document.getElementById("languageA").value,
+                    fieldB: document.getElementById("languageB").value
+                }, function(err, response) {
+                });
 
-function saveWord() {
-	//document.getElementById("btnAdd").innerHTML = 
-db.post({
-  fieldA: document.getElementById("languageA").value,
-  fieldB: document.getElementById("languageB").value
-}, function (err, response) { });
+                showWords();
+            }
 
-showWords();
-}
+            //var myMapFun = {
+            //    map: function(doc) {
+            //        	emit(doc.fieldA);
+            //    }
+            //};
+	    function myMapFun(direction) {
+		var func;
+		if (direction == "A") {
+		func = {
+		map: function(doc) {
+			emit(doc.fieldA);
+		}
+		}
+		}
+		if (direction == "B") {
+		func = {
+                  map: function(doc) {
+                          emit(doc.fieldB);
+                  }
+                  }
+                  }
 
-var myMapFun = {
-  map: function (doc) {
-    emit(doc.fieldA);
-  }
-};
+		return func;
+	    }
 
-function queryWord() {
-	var queryText = document.getElementById("queryBox").value;
- 	db.query(myMapFun, {
-  	  key         : queryText, 
-  	  include_docs : true
-	}, function (err, result) {
-	console.log("Query results:");
-	console.log(result);
-  	redrawTodosUI(result.rows);
-	console.log("Error while querying:\n");
-        console.log(err);
-	});       
+            function queryWord() {
+                //in radioA active
+		//console.log($('#radioA').hasClass('active')); 
+		var direction;
+		if ($('#radioA').hasClass('active')) {
+			direction = "A";
+		}
+		if ($('#radioB').hasClass('active')) {
+			direction = "B";
+		}
+		var queryText = document.getElementById("queryBox").value;
+                db.query(myMapFun(direction),
+		   {
+                      key: queryText,
+                      include_docs: true
+                   },
+		   function(err, result) {
+                      console.log("Query results:");
+                      console.log(result);
+                      redrawTodosUI(result.rows);
+                      console.log("Error while querying:\n");
+                      console.log(err);
+                   }
+		);
 
-}
-
-//$("#table_div").append("<tr><td>" + value + "</td></tr>");
-
-</script>
-<div class="row">
-  <div class="span4">Insert a new word into vocabulary<br />
-<input type="text" id="languageA"  data-provide="typeahead"><br />
-<input type="text" id="languageB" data-provide="typeahead"><br />
-<button id="btnAdd" onclick="saveWord()">Add it!</button>
-<button id="btnReload" onclick="reloadWords()">Reload vocabulary</button>
-<input type="text" id="queryBox"><br />
-<button id="btnQuery" onclick="queryWord()">Query</button><br />
-</div>
-  <div class="span5">Vocabulary<br />
-<table class="table table-striped" id="table_div">
-</table>
-<ul id="word-list"></ul>
-</div>
-</div>
-  </body>
+            }
+//$('.btn-group').button();
+            //$("#table_div").append("<tr><td>" + value + "</td></tr>");
+        </script>
+        <div class="row">
+            <div class="span4">Insert a new word into vocabulary<br />
+                <input type="text" id="languageA"  data-provide="typeahead"><br />
+                <input type="text" id="languageB" data-provide="typeahead"><br />
+                <button id="btnAdd" onclick="saveWord()" class="btn btn-success">Add it!</button>
+                <button id="btnReload" onclick="showWords()" class="btn btn-warning">Reload vocabulary</button>
+		<br />
+		<br />
+		From language:<br /> 
+		<div class="btn-group" data-toggle="buttons-radio">
+  			<button type="button" class="btn btn-primary active" id="radioA">LanguageA</button>
+  			<button type="button" class="btn btn-primary" id="radioB">LanguageB</button>
+		</div><br />
+		<input type="text" id="queryBox"><br />
+                <button id="btnQuery" onclick="queryWord()" class="btn btn-danger">Query</button><br />
+            </div>
+            <div class="span5">Vocabulary<br />
+                <table class="table table-striped" id="table_div">
+                </table>
+                <ul id="word-list"></ul>
+            </div>
+        </div>
+    </body>
 </html>
 
