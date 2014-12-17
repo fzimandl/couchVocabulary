@@ -14,6 +14,7 @@
 <script>
 var db = new PouchDB('http://localhost:5984/vocabulary');
 showWords();
+
 function redrawTodosUI(todos) {
     //var ul = document.getElementById('word-list');
     //ul.innerHTML = '';
@@ -23,28 +24,55 @@ $("#table_div").empty();
       //ul.appendChild(createTodoListItem(todo.doc));
     });
   }
+
 function reloadWords() {
 	showWords();
 }
+
 function showWords() {
+//Load all docs
   db.allDocs({include_docs: true, descending: true}, function(err, doc) {
-    console.log("Retrieved document object:\n");
+    console.log("Retrieved all document objects:\n");
     console.log(doc);
     console.log("Error while retrieving all docs:\n");
     console.log(err);
     redrawTodosUI(doc.rows);
   });
 }
+
 function saveWord() {
 	//document.getElementById("btnAdd").innerHTML = 
 db.post({
   fieldA: document.getElementById("languageA").value,
   fieldB: document.getElementById("languageB").value
 }, function (err, response) { });
+
 showWords();
+}
+
+var myMapFun = {
+  map: function (doc) {
+    emit(doc.fieldA);
+  }
+};
+
+function queryWord() {
+	var queryText = document.getElementById("queryBox").value;
+ 	db.query(myMapFun, {
+  	  key         : queryText, 
+  	  include_docs : true
+	}, function (err, result) {
+	console.log("Query results:");
+	console.log(result);
+  	redrawTodosUI(result.rows);
+	console.log("Error while querying:\n");
+        console.log(err);
+	});       
+
+}
 
 //$("#table_div").append("<tr><td>" + value + "</td></tr>");
-}
+
 </script>
 <div class="row">
   <div class="span4">Insert a new word into vocabulary<br />
@@ -52,6 +80,8 @@ showWords();
 <input type="text" id="languageB" data-provide="typeahead"><br />
 <button id="btnAdd" onclick="saveWord()">Add it!</button>
 <button id="btnReload" onclick="reloadWords()">Reload vocabulary</button>
+<input type="text" id="queryBox"><br />
+<button id="btnQuery" onclick="queryWord()">Query</button><br />
 </div>
   <div class="span5">Vocabulary<br />
 <table class="table table-striped" id="table_div">
