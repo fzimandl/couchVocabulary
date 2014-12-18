@@ -31,7 +31,15 @@
                 <button id="btnQuery" onclick="queryWord()" class="btn btn-danger">Query</button><br />
             </div>
             <div class="span5">Vocabulary<br />
-                <table class="table table-striped" id="table_div">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Language A <a href="#" onclick="sort('A',false)">&darr;</a> <a href="#" onclick="sort('A',true)">&uarr;</a></th>
+                            <th>Language B <a href="#" onclick="sort('B',false)">&darr;</a> <a href="#" onclick="sort('B',true)">&uarr;</a></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table_div">
+                    </tbody>
                 </table>
                 <ul id="word-list"></ul>
             </div>
