@@ -15,7 +15,7 @@
         <script src="pouchdb-3.2.0.min"></script>
         <script src="vocabulary.js"></script>
         <div class="row">
-            <div class="span4">Insert a new word into vocabulary<br />
+            <div class="span3 offset1">Insert a new word into vocabulary<br />
                 <input type="text" id="languageA"  data-provide="typeahead"><br />
                 <input type="text" id="languageB" data-provide="typeahead"><br />
                 <button id="btnAdd" onclick="saveWord()" class="btn btn-success">Add it!</button>
@@ -30,18 +30,24 @@
 		<input type="text" id="queryBox"><br />
                 <button id="btnQuery" onclick="queryWord()" class="btn btn-danger">Query</button><br />
             </div>
-            <div class="span5">Vocabulary<br />
+            <div class="span3 offset2"><b>Vocabulary</b><br /><br /> 
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Language A <a href="#" onclick="sort('A',false)">&darr;</a> <a href="#" onclick="sort('A',true)">&uarr;</a></th>
-                            <th>Language B <a href="#" onclick="sort('B',false)">&darr;</a> <a href="#" onclick="sort('B',true)">&uarr;</a></th>
+                            <th>Language&nbsp;A&nbsp;<a href="#" onclick="sort('A',false)">&darr;</a>&nbsp;<a href="#" onclick="sort('A',true)">&uarr;</a></th>
+                            <th>Language&nbsp;B&nbsp;<a href="#" onclick="sort('B',false)">&darr;</a>&nbsp;<a href="#" onclick="sort('B',true)">&uarr;</a></th>
                         </tr>
                     </thead>
                     <tbody id="table_div">
                     </tbody>
                 </table>
                 <ul id="word-list"></ul>
+            </div>
+            <div class="span3 offset3"><b>Testing: </b><br /><br />
+                <span id="question"></span><br />
+                <input type="text" id="checkWordBox"><br />
+                <button id="btnCheck" onclick="checkWord()" class="btn btn-danger">Check</button><br /><br />
+                <span style="color: red" id="result"></span><br />
             </div>
         </div>
 	</div>

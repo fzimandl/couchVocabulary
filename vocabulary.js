@@ -100,5 +100,45 @@ function sort(field, descending) {
     }
     );
 }
+retrieveOneRandom('A');
+function retrieveOneRandom(direction) {
+    db.allDocs().then(function(res) {
+        var ids = res.rows.map(function(row) {
+            return row.id;
+        });
+        var index = Math.floor(Math.random() * ids.length);
+        return db.get(ids[index]);
+    }).then(function(randomDoc) {
+        if (direction === "A") {
+            document.getElementById("question").innerHTML = randomDoc.fieldA;
+        }
+        if (direction === "B") {
+            document.getElementById("question").innerHTML = randomDoc.fieldB;
+        }
+    }).catch(console.log.bind(console));
+}
+
+function checkWord() {
+    db.query(myMapFun("A"),
+            {
+                include_docs: true,
+                key: document.getElementById("question").innerHTML
+            },
+    function(err, result) {
+        console.log("Checking results:");
+        console.log(result);
+        document.getElementById("result").innerHTML = "Not known...";
+        result.rows.forEach(function(row){
+            if (row.doc.fieldB === document.getElementById("checkWordBox").value) {
+                document.getElementById("result").innerHTML = "Right!";
+            }
+        });
+        console.log("Error while checking:\n");
+        console.log(err);
+    }
+    );
+    
+    retrieveOneRandom("A");
+}
 //$('.btn-group').button();
 //$("#table_div").append("<tr><td>" + value + "</td></tr>");
